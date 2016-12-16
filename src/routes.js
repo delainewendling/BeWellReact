@@ -11,8 +11,8 @@ export default (
     <IndexRoute component={LoginView} />
     <Route path="login" component={LoginView}/>
     <Route path="register" component={RegisterView}/>
-    <Route path="assessment/:id" component={AssessmentControl}/>
+    <Route path="assessment/1" header="Mentally" component={AssessmentControl}/>
+    <Route path="assessment/2" header="Physically" component={AssessmentControl}/>
+    <Route path="assessment/3" component={EmotionControl}/>
   </Route>
 )
-
-  //<Route path="assessment/3" component={EmotionControl}/>

@@ -14,12 +14,13 @@ class AssessmentControl extends React.Component{
     this.submitAssessment = this.submitAssessment.bind(this);
   }
   componentDidMount(){
-    if (this.props.routeParams.id === "1"){
+    console.log("props", this.props);
+    if (this.props.route.header === "Mentally"){
         this.setState({
           IsPhysical: false,
           header: "Mentally"
         })
-    } else if (this.props.routeParams.id === "2") {
+    } else if (this.props.route.header === "Physically") {
         this.setState({
           IsPhysical: true,
           header: "Physically"
@@ -32,18 +33,19 @@ class AssessmentControl extends React.Component{
         IsPhysical: this.state.IsPhysical
     }
     this.props.actions.addAssessment(assessment);
-    if (this.props.routeParams.id === "1"){
+    if (this.props.route.header === "Mentally"){
       this.context.router.push('/assessment/2');
-    } else if (this.props.routeParams.id === "2") {
+    } else if (this.props.route.header === "Physically") {
       this.context.router.push('/assessment/3');
     }
   }
   render(){
+    const header = this.props.route.header;
     return (
       <div>
         <AssessmentForm
           onClick={this.submitAssessment}
-          header={this.state.header}
+          header={header}
         />
       </div>
     )
