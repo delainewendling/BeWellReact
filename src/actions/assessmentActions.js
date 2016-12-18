@@ -1,55 +1,10 @@
 import * as types from './actionTypes';
 import {beginAjaxCall} from './ajaxStatusActions';
-import axios from 'axios';
 import 'whatwg-fetch';
 
-export function addAssessmentSuccess(assessment){
-  return { type: types.ADD_ASSESSMENT_SUCCESS, assessment};
+export function getEmotionsSuccess(emotions){
+  return { type: types.GET_EMOTIONS_SUCCESS, emotions};
 }
-
-export function addEmotionSuccess(emotion){
-  return { type: types.ADD_EMOTION_SUCCESS, emotion};
-}
-
-// export function addAssessment(assessment) {
-//   console.log(assessment);
-//   return dispatch =>{
-//     dispatch(beginAjaxCall());
-//     return axios({
-//       method: 'post',
-//       url: 'http://bewellapi20161212034630.azurewebsites.net/UserAssessments',
-//       data: assessment,
-//       responseType: 'json'
-//     })
-//     .then(assessmentResponse =>{
-//         console.log("Successful Assessment Add", assessmentResponse);
-//         dispatch(addAssessmentSuccess(assessmentResponse));
-//     })
-//     .catch(error =>{
-//       throw(error);
-//     })
-//   }
-// }
-
-// export function addAssessment(assessment) {
-//   console.log(assessment);
-//   return dispatch =>{
-//     dispatch(beginAjaxCall());
-//     return axios({
-//       method: 'post',
-//       url: 'http://localhost:5000/UserAssessments',
-//       data: assessment,
-//       responseType: 'json'
-//     })
-//     .then(assessmentResponse =>{
-//         console.log("Successful Assessment Add", assessmentResponse);
-//         dispatch(addAssessmentSuccess(assessmentResponse));
-//     })
-//     .catch(error =>{
-//       throw(error);
-//     })
-//   }
-// }
 
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -78,7 +33,6 @@ export function addAssessment(assessment) {
     .then(checkStatus)
     .then(assessmentResponse =>{
         console.log("Successful Assessment Add", assessmentResponse);
-        dispatch(addAssessmentSuccess(assessmentResponse));
     })
     .catch(error =>{
       throw(error);
@@ -86,43 +40,61 @@ export function addAssessment(assessment) {
   }
 }
 
-
-// export function addEmotion(emotion) {
-//   return dispatch =>{
-//     dispatch(beginAjaxCall());
-//     return axios({
-//         method: 'post',
-//         url: 'http://bewellapi20161212034630.azurewebsites.net/Emotion',
-//         data: emotion,
-//         responseType: 'json'
-//     })
-//     .then(emotionResponse =>{
-//         console.log("Successful Emotion Add", emotionResponse);
-//         dispatch(addEmotionSuccess(emotionResponse));
-//     })
-//     .catch(error =>{
-//       throw(error);
-//     })
-//   }
-// }
-
-export function addEmotion(emotion) {
+export function getEmotionsInCategory(categoryId){
   return dispatch =>{
     dispatch(beginAjaxCall());
-    return axios({
-        method: 'post',
-        url: 'http://localhost:5000/Emotion',
-        data: emotion,
-        responseType: 'json',
-        xsrfCookieName: 'XSRF-TOKEN',
-        xsrfHeaderName: 'X-XSRF-TOKEN'
+    fetch('http://localhost:5000/Emotions/'+categoryId, {
+      method: 'get',
+      headers: {
+        'Accept': 'application/json',
+        'Access-Control-Allow-Credentials': 'true',
+        'Content-Type': "application/json"
+      },
+      credentials: "include"
     })
-    .then(emotionResponse =>{
-        console.log("Successful Emotion Add", emotionResponse);
-        dispatch(addEmotionSuccess(emotionResponse));
+    .then(checkStatus)
+    .then(emotions =>{
+        console.log("get emotions", emotions);
+        dispatch(getEmotionsSuccess(emotions));
     })
     .catch(error =>{
       throw(error);
     })
   }
+}
+
+export function addEmotion(emotion){
+  return dispatch =>{
+    dispatch(beginAjaxCall());
+    fetch('http://localhost:5000/UserAssessments', {
+      method: 'post',
+      body: JSON.stringify(emotion),
+      headers: {
+        'Accept': 'application/json',
+        'Access-Control-Allow-Credentials': 'true',
+        'Content-Type': "application/json"
+      },
+      credentials: "include"
+    })
+    .then(checkStatus)
+    .then(emotionResponse =>{
+        console.log("Successful Emotion Add", emotionResponse);
+        return emotionResponse;
+    })
+    .catch(error =>{
+      throw(error);
+    })
+  }
+}
+
+export function addEmotions(emotions) {
+  Promise.all(emotions.map(emotion =>{
+    return addEmotion(emotion);
+  })))
+  .then(emotionResponse =>{
+    console.log("emotions added", emotionResponse);
+  })
+  .catch(error=>{
+    console.log("error", error);
+  })
 }
