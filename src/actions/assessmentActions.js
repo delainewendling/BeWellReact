@@ -2,12 +2,8 @@ import * as types from './actionTypes';
 import {beginAjaxCall} from './ajaxStatusActions';
 import 'whatwg-fetch';
 
-export function addAssessmentSuccess(assessment){
-  return { type: types.ADD_ASSESSMENT_SUCCESS, assessment};
-}
-
-export function addEmotionSuccess(emotion){
-  return { type: types.ADD_EMOTION_SUCCESS, emotion};
+export function getEmotionsSuccess(emotions){
+  return { type: types.GET_EMOTIONS_SUCCESS, emotions};
 }
 
 function checkStatus(response) {
@@ -37,7 +33,6 @@ export function addAssessment(assessment) {
     .then(checkStatus)
     .then(assessmentResponse =>{
         console.log("Successful Assessment Add", assessmentResponse);
-        dispatch(addAssessmentSuccess(assessmentResponse));
     })
     .catch(error =>{
       throw(error);
@@ -45,7 +40,30 @@ export function addAssessment(assessment) {
   }
 }
 
-export function addEmotion(emotion) {
+export function getEmotionsInCategory(categoryId){
+  return dispatch =>{
+    dispatch(beginAjaxCall());
+    fetch('http://localhost:5000/Emotions/'+categoryId, {
+      method: 'get',
+      headers: {
+        'Accept': 'application/json',
+        'Access-Control-Allow-Credentials': 'true',
+        'Content-Type': "application/json"
+      },
+      credentials: "include"
+    })
+    .then(checkStatus)
+    .then(emotions =>{
+        console.log("get emotions", emotions);
+        dispatch(getEmotionsSuccess(emotions));
+    })
+    .catch(error =>{
+      throw(error);
+    })
+  }
+}
+
+export function addEmotion(emotion){
   return dispatch =>{
     dispatch(beginAjaxCall());
     fetch('http://localhost:5000/UserAssessments', {
@@ -61,10 +79,22 @@ export function addEmotion(emotion) {
     .then(checkStatus)
     .then(emotionResponse =>{
         console.log("Successful Emotion Add", emotionResponse);
-        dispatch(addEmotionSuccess(emotionResponse));
+        return emotionResponse;
     })
     .catch(error =>{
       throw(error);
     })
   }
+}
+
+export function addEmotions(emotions) {
+  Promise.all(emotions.map(emotion =>{
+    return addEmotion(emotion);
+  })))
+  .then(emotionResponse =>{
+    console.log("emotions added", emotionResponse);
+  })
+  .catch(error=>{
+    console.log("error", error);
+  })
 }

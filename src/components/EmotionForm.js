@@ -1,7 +1,7 @@
 import React from 'react';
 import EmotionRow from './components/EmotionRow';
 
-const EmotionForm = ({emotions, getEmotions, clickEmotion})=>{
+const EmotionForm = ({emotions, getEmotions, clickEmotion, submitEmotions})=>{
   render(){
     return (
       //Tabs at the top to signify emotions
@@ -28,8 +28,13 @@ const EmotionForm = ({emotions, getEmotions, clickEmotion})=>{
         </div>
         //Rows of emotions
         {emotions.length > 0 && emotions.map((emotion, index) =>
-          <EmotionRow key={index} emotion={emotion} onClick={clickEmotion}/>
+          <EmotionRow
+            key={index}
+            emotion={emotion}
+            clickEmotion={clickEmotion}
+          />
         )}
+        <button onClick={submitEmotions}> Submit </button>
       </div>
     )
   }
