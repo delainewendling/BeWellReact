@@ -1,10 +1,21 @@
 import * as types from './actionTypes';
 import {beginAjaxCall} from './ajaxStatusActions';
-import axios from 'axios';
 import 'whatwg-fetch';
+
 
 export function loginUserSuccess(user){
   return { type: types.LOGIN_USER_SUCCESS, user};
+}
+
+function checkStatus(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response
+  } else {
+    var error = new Error(response.statusText)
+    error.response = response
+    console.log(error);
+    throw error
+  }
 }
 
 //The register method in the API will log the user in. Therefore, the login action is dispatched upon successful registration
@@ -21,7 +32,7 @@ function checkStatus(response) {
 export function registerUser(user) {
   return dispatch =>{
     dispatch(beginAjaxCall());
-    fetch('http://localhost:5000/account/LoginJson', {
+    fetch('http://localhost:5000/account/registerjson',{
       method: 'post',
       body: JSON.stringify(user),
       headers: {
@@ -31,9 +42,10 @@ export function registerUser(user) {
       credentials: "include"
     })
     .then(checkStatus)
-    .then(userResponse =>{
-        console.log("Successful Registration", userResponse);
-        dispatch(loginUserSuccess(userResponse.data));
+    .then(response => response.json())
+        .then((responseJson) => {
+        console.log("Successful Registration", responseJson);
+        dispatch(loginUserSuccess(responseJson.data));
     })
     .catch(error =>{
       throw(error);
@@ -55,9 +67,10 @@ export function loginUser(user) {
       credentials: "include"
     })
     .then(checkStatus)
-    .then(userResponse =>{
-      console.log("Successful Login", userResponse);
-      dispatch(loginUserSuccess(userResponse));
+    .then(response => response.json())
+      .then((responseJson) => {
+      console.log("Successful Login", responseJson);
+      dispatch(loginUserSuccess(responseJson));
     })
     .catch(error =>{
       throw(error);

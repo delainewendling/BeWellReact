@@ -4,7 +4,7 @@ import App from './App.js';
 import RegisterView from './containers/RegisterView';
 import LoginView from './containers/LoginView';
 import AssessmentControl from './containers/AssessmentControl';
-//import EmotionControl from './containers/EmotionControl';
+import EmotionControl from './containers/EmotionControl';
 
 export default (
   <Route path="/" component={App}>
